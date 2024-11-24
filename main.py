@@ -1,7 +1,6 @@
 import robotica
 from dataclasses import dataclass
 from typing import List, Tuple
-import random
 
 
 @dataclass
@@ -60,7 +59,6 @@ class FuzzyController:
             "turn_right": (self.rules.TURN_SPEED, -self.rules.SLOW_SPEED),
             "emergency_turn": (-self.rules.TURN_SPEED, self.rules.TURN_SPEED)
         }
-
         return speeds[action]
 
     def compute_movement(self, readings: List[float]) -> Tuple[float, float]:
