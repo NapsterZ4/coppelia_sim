@@ -1,15 +1,16 @@
 import robotica
 from dataclasses import dataclass
 from typing import List, Tuple
+import random
 
 
 @dataclass
 class FuzzyRules:
     """Fuzzy rules for the robot navigation"""
 
-    VERY_CLOSE = 0.8
-    CLOSE = 0.5
-    SAFE = 0.3
+    VERY_CLOSE = 0.2
+    CLOSE = 0.3
+    SAFE = 0.8
 
     NORMAL_SPEED = 1.0
     TURN_SPEED = 0.6
@@ -43,20 +44,23 @@ class FuzzyController:
                            right: float) -> str:
         if center < self.rules.VERY_CLOSE:
             return "emergency_turn"
-        elif left < self.rules.CLOSE:
-            return "turn_right"
+        elif left < self.rules.CLOSE and right < self.rules.CLOSE:
+            return "emergency_turn"
         elif right < self.rules.CLOSE:
             return "turn_left"
+        elif left < self.rules.CLOSE:
+            return "turn_right"
         else:
             return "advance"
 
     def get_wheel_speeds(self, action: str) -> Tuple[float, float]:
         speeds = {
             "advance": (self.rules.NORMAL_SPEED, self.rules.NORMAL_SPEED),
-            "turn_left": (self.rules.SLOW_SPEED, self.rules.TURN_SPEED),
-            "turn_right": (self.rules.TURN_SPEED, self.rules.SLOW_SPEED),
-            "emergency_turn": (-self.rules.SLOW_SPEED, self.rules.TURN_SPEED)
+            "turn_left": (-self.rules.SLOW_SPEED, self.rules.TURN_SPEED),
+            "turn_right": (self.rules.TURN_SPEED, -self.rules.SLOW_SPEED),
+            "emergency_turn": (-self.rules.TURN_SPEED, self.rules.TURN_SPEED)
         }
+
         return speeds[action]
 
     def compute_movement(self, readings: List[float]) -> Tuple[float, float]:
